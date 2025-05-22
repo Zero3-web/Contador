@@ -145,7 +145,7 @@
         </div>
         <div id="contador"></div>
         <div class="mensaje-inferior" id="mensaje-inferior">
-            y ha sido de los mejores días de mi vida
+            <!-- El mensaje se llenará por JS -->
             <div id="mensaje-extra" style="margin-top:0.7em;font-size:1em;font-weight:400;color:#fff;text-shadow:0 2px 8px #0007;opacity:0;transition:opacity 0.7s;">
                 Esto es para ti 👇
             </div>
@@ -204,18 +204,32 @@
                 background:none;border:none;font-size:1.5em;cursor:pointer;color:#e75480;
                 font-weight:bold;line-height:1;display:none;" title="Cerrar">&times;</button>
             <div style="margin-top:1.5em;">
-                <b>Mi amor:</b><br>
                 <span id="typing-carta" style="display:block;margin-top:1em;min-height:5em;"></span>
                 <img id="foto-carta" src="Img/foto.jpg" alt="Foto especial" style="margin-top:1.5em;max-width:85%;border-radius:12px;box-shadow:0 4px 18px #0002;opacity:0;transition:none;">
             </div>
         </div>
     </div>
     <!-- Audio oculto para reproducir música -->
-    <audio id="audio-carta" src="Music/"></audio>
+    <audio id="audio-carta" src=""></audio>
     <script src="Js/contador.js"></script>
     <script>
-    // Efecto typing para "Estamos juntos"
-    const texto = "Estamos juntos";
+    // --- NUEVO: Leer parámetros de la URL ---
+    function getParams() {
+        const params = new URLSearchParams(window.location.search);
+        return {
+            fecha: params.get('fecha'), // formato YYYY-MM-DD
+            titulo: params.get('titulo'),
+            mensajeInferior: params.get('mensajeInferior'),
+            mensajeCarta: params.get('mensajeCarta'),
+            fotoURL: params.get('fotoURL'),
+            musicaURL: params.get('musicaURL')
+        };
+    }
+    const urlParams = getParams();
+
+    // --- NUEVO: Usar parámetros o valores por defecto ---
+    // Título typing
+    const texto = urlParams.titulo || "Estamos juntos";
     const typingSpan = document.getElementById('typing-text');
     let i = 0;
     function typingEffect() {
@@ -226,6 +240,29 @@
         }
     }
     typingEffect();
+
+    // Mensaje inferior
+    const mensajeInferior = urlParams.mensajeInferior || "y ha sido de los mejores días de mi vida";
+    document.getElementById('mensaje-inferior').childNodes[0].textContent = mensajeInferior;
+
+    // Mensaje carta
+    let mensajeCarta = urlParams.mensajeCarta || `Gracias por cada momento, por tu sonrisa y por hacer mi vida tan especial.
+    Te amo más de lo que las palabras pueden decir. Realmente eres lo mejor que tengo <3`;
+
+    // Foto carta
+    const fotoCarta = document.getElementById('foto-carta');
+    if (urlParams.fotoURL) {
+        fotoCarta.src = urlParams.fotoURL;
+    }
+
+    // Música carta
+    const audioCarta = document.getElementById('audio-carta');
+    if (urlParams.musicaURL) {
+        audioCarta.src = urlParams.musicaURL;
+    }
+
+    // --- NUEVO: Pasar fecha personalizada a contador.js ---
+    window._contadorFechaParam = urlParams.fecha; // global temporal
 
     // Mostrar mensaje-inferior 2 segundos después de la animación del contador
     window.addEventListener('DOMContentLoaded', () => {
@@ -363,9 +400,6 @@
     }
 
     // Efecto typing para el contenido de la carta
-    const mensajeCarta = `Gracias por cada momento, por tu sonrisa y por hacer mi vida tan especial.
-    Te amo más de lo que las palabras pueden decir. Realmente eres lo mejor que tengo <3`;
-
     function typingCartaEffect(text, element, delay = 70, onFinish) {
         element.textContent = "";
         let i = 0;

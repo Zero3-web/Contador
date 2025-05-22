@@ -1,5 +1,23 @@
-// Cambia esta fecha por la de tu aniversario (formato: año, mes-1, día)
-const fechaInicio = new Date(2022, 0, 1, 0, 0, 0); // Cambia la fecha si lo deseas
+// Función para obtener el parámetro de fecha de la URL
+function getFechaParam() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('fecha');
+}
+
+let fechaInicio;
+const fechaParam = getFechaParam();
+if (fechaParam) {
+    const partes = fechaParam.split('-');
+    if (partes.length === 3) {
+        const [y, m, d] = partes.map(Number);
+        if (!isNaN(y) && !isNaN(m) && !isNaN(d)) {
+            fechaInicio = new Date(y, m - 1, d, 0, 0, 0);
+        }
+    }
+}
+if (!fechaInicio || isNaN(fechaInicio.getTime())) {
+    fechaInicio = new Date(2022, 0, 1, 0, 0, 0); // valor por defecto
+}
 
 function pad(n) {
     return n.toString().padStart(2, '0');
